@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title> jQuery & Underscore.js</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+
+
+</head>
+<body>
+  <form validate>
+    <div class="form-item name">
+      <label for="name">Name: </label>
+      <input name="name" value="" validate-required validate-minlength="5" validate-maxlength="30" />
+    </div>
+
+    <div class="form-item email">
+      <label for="email">Email:</label>
+      <input name="email" value="" validate-required validate-email />
+    </div>
+
+    <div class="form-item date">
+      <label for="date">Date:</label>
+      <input name="date" value="" type="date" validate-date />
+    </div>
+
+    <div class="form-item ip">
+      <label for="ip">Ip:</label>
+      <input name="ip" value="" validate-regexp="^\d+\.\d+\.\d+\.\d+$" />
+    </div>
+    
+    <div class="send">
+      <input type="submit" value="Send" />
+    </div>
+  </form>
+
+  <div data-countdown data-countdown-start="91:00:02:15">
+    <div class="countdown">
+      <h3>We're coming soon..</h3>
+      <div class="numbers">
+        <div class="countdown-numbers">
+          <div class="countdown-days">00</div>
+          <span>DAYS</span>
+        </div>
+
+        <div class="countdown-numbers">
+          <div class="countdown-hours">00</div>
+          <span>HOURS</span>
+        </div>
+
+        <div class="countdown-numbers">
+          <div class="countdown-minutes">00</div>
+          <span>MINUTES</span>
+        </div>
+
+        <div class="countdown-numbers">
+          <div class="countdown-seconds">00</div>
+          <span>SECONDS</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    $('form[validate]').submit(function() {
+
+      $('span.message').remove();
+
+      $('input[validate-required]').each(function(i, requiredInput) {
+        var $requiredInput = $(requiredInput);
+        if ($requiredInput.val() == "") {
+          $requiredInput.after("<span class='message'>This field is required!</span>");
+          event.preventDefault();
+        }
+      });
+
+      $('input[validate-minlength]').each(function(i, input) {
+        var $input = $(input);
+        if ($input.val().length <= 4) {
+          $input.after("<span class='message'>Too short!</span>");
+        }
+      });
+
+      $('input[validate-maxlength]').each(function(i, input) {
+        var $input = $(input);
+        if ($input.val().length >= 30) {
+          $input.after("<span class='message'>Too long!</span>");
+        }
+      });
+
+      $('input[validate-email]').each(function(i, input) {
+        var $input = $(input);
+        if ($input.val().indexOf("@") == -1) {
+          $('div.email').after("<span class='message'>Wrong email format!</span>");
+          event.preventDefault();
+        }
+      });
+
+      $('input[validate-date]').each(function(i, input) {
+        var $input = $(input);
+        if (isNaN(new Date($input.val() ).getTime()) ) {
+          $('div.date').after("<span class='message'>Wrong date format!</span>");
+          event.preventDefault();
+        };
+      });
+      
+      $('input[validate-regexp]').each(function(i, input) {
+        var $input = $(input);
+        if (!/^\d+\.\d+\.\d+\.\d+$/.test($input.val()) ) {
+          $('div.ip').after("<span class='message'>Wrong ip format!</span>");
+          event.preventDefault();
+        };
+      });
+    });
+
+    function pad(n, width, z) {
+      z = z || '0';
+      n = n + '';
+      return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+    }
+
+    var days = 24*60*60,
+        hours = 60*60,
+        minutes = 60;
+
+    var date = $('div[data-countdown]').data('countdown-start');
+    var dateStr = date.split(":");
+
+    var prDay = parseFloat(dateStr[0]);
+    var prHour = parseFloat(dateStr[1]);
+    var prMinute = parseFloat(dateStr[2]);
+    var prSecond = parseFloat(dateStr[3]);
+
+    var daysMiliseconds = prDay * days * 1000;
+    var hoursMiliseconds = prHour * hours * 1000;
+    var minutesMiliseconds = prMinute * minutes * 1000;
+    var secondsMiliseconds = prSecond * 1000;
+
+    var deadline = new Date().getTime() + daysMiliseconds + hoursMiliseconds + minutesMiliseconds + secondsMiliseconds;
+
+    setInterval(function() {
+      
+      var left = Math.floor((deadline - (new Date())) / 1000);
+
+      var d = Math.floor(left / days);
+      left -= d*days;
+
+      var h = Math.floor(left / hours);
+      left -= h*hours;
+
+      var m = Math.floor(left / minutes);
+      left -= m*minutes;
+
+      s = left;
+
+      $('div.countdown-days').html(pad(d, 2));
+      $('div.countdown-hours').html(pad(h, 2));
+      $('div.countdown-minutes').html(pad(m, 2));
+      $('div.countdown-seconds').html(pad(s, 2));
+
+    }, 1000);
+
+  </script>
+
+</body>
+</html>
